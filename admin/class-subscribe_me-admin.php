@@ -100,4 +100,47 @@ class Subscribe_me_Admin {
 
 	}
 
+	function add_menu_pages()
+	{
+		add_menu_page(
+			'Subscribe Me',
+			'Subscribe Mail',
+			'manage_options',
+			'subscribe-me',
+			array($this, 'subscribe_me_cb'),
+			'dashicons-email',
+			100
+		);
+	}
+
+	function subscribe_me_cb()
+	{
+?>
+		<div class="wrap">
+			<h2>Subscribe Me</h2>
+			<form method="post" action="options.php">
+				<?php
+				settings_fields('my_plugin_settings_group');
+				do_settings_sections('subscribe-me-settings');
+				?>
+				<?php submit_button('Save Changes'); ?>
+			</form>
+		</div>
+<?php
+	}
+
+	function reg_settings()
+	{
+		register_setting('my_plugin_settings_group', 'no_of_posts');
+		add_settings_section('subs_settings', 'Subscription Mail Settings', '', 'subscribe-me-settings');
+		add_settings_field('no_of_posts', 'No of Posts', array($this, 'no_of_posts_cb'), 'subscribe-me-settings', 'subs_settings');
+	}
+
+	public function no_of_posts_cb()
+	{
+	?>
+		<input type="text" name="no_of_posts" value="<?php echo esc_attr(get_option('no_of_posts')) ?>">
+	<?php
+	}
+
 }
