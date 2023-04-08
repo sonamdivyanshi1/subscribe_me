@@ -100,4 +100,110 @@ class Subscribe_me_Public {
 
 	}
 
+	public function email_subscriber_form_shortcode_fun()
+	{
+		add_shortcode('my-shortcode', array($this, 'email_subscriber_form_shortcode'));
+	}
+
+	//Callback for shortcode
+	function email_subscriber_form_shortcode()
+	{
+		$output = '<div class="wrap subs-wrap mail-form">
+                    <form class="subscribe-me-form" method="post">
+                        <input type="hidden" name="action" value="subs_form">
+                        <label for="email">Email:</label>
+                        <input type="email" name="email" id="email" required/><br />
+                        <input type="submit" name="submit" id="subscribe-button" value="Subscribe Me"/>
+                    </form>
+                </div>';
+		return $output;
+	}
+
+	function add_shortcode_to_header()
+	{
+		echo do_shortcode('[my-shortcode]');
+	}
+
+	function save_subscriber_email()
+	{
+		if (isset($_POST['email'])) {
+			$email = sanitize_email($_POST['email']);
+			$pattern = '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/';
+
+			if (preg_match($pattern, $email)) {
+				if (isset($_POST['submit'])) {
+
+					$subscribed_mails = get_option('subscribed_mails');
+
+					if (!$subscribed_mails) {
+						$subscribed_mails = array();
+					}
+
+					if (in_array($email, $subscribed_mails)) {
+						echo '<script>alert("You are already subscribed!");</script>';
+					} else {
+						$subscribed_mails[] = $email;
+						update_option('subscribed_mails', $subscribed_mails);
+
+						// Display a success message
+						echo '<script>alert("You have been subscribed Successfully!");</script>';
+						
+						//To send latest post details
+						$this->send_subscription_mail($email);
+
+					}
+					
+				}
+			} else {
+				echo '<script>alert("Please Enter a valid email!");</script>';
+			}
+		}
+	}
+
+	function send_subscription_mail($to)
+	{
+		$subject = 'Congratulations! You are Subscribed';
+		$summary = $this->get_daily_post_details();
+		$message = 'You are getting latest post details.';
+		$message .= "\n\n";
+		$message .= "Here are our latest posts";
+		$message .= "\n";
+
+		foreach ($summary as $post_data) {
+			$message .= 'Title: ' . $post_data['title'] . "\n";
+			$message .= 'URL: ' . $post_data['url'] . "\n";
+			$message .= "\n";
+		}
+
+		$headers = array(
+			'From: sonam.divyanshi@wisdmlabs.com',
+			'Content-Type: text/html; charset=UTF-8'
+		);
+
+		wp_mail($to, $subject, $message, $headers);
+	}
+
+	function get_daily_post_details()
+	{
+		$args = array(
+			'post_type' => 'post',
+			'posts_per_page' => get_option('no_of_posts'),
+			'post_status' => 'publish'
+		);
+
+		$query = new WP_Query($args);
+		$posts = $query->posts;
+		$mail_list = array();
+
+		foreach ($posts as $post) {
+			$post_data = array(
+				'title' => $post->post_title,
+				'url' => get_permalink($post->ID),
+			);
+			array_push($mail_list, $post_data);
+		}
+		return $mail_list;
+	}
+
+
 }
