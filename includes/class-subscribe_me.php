@@ -156,7 +156,8 @@ class Subscribe_me {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-
+		$this->loader->add_action('admin_menu', $plugin_admin , 'add_menu_pages');
+		$this->loader->add_action('admin_init', $plugin_admin, 'reg_settings');
 	}
 
 	/**
@@ -172,7 +173,14 @@ class Subscribe_me {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		//To define shortcode
+		$this->loader->add_action( 'init', $plugin_public, 'email_subscriber_form_shortcode_fun' );
 
+		//To display shortcode on frontpage in header section
+		$this->loader->add_action('wp_head', $plugin_public, 'add_shortcode_to_header');
+
+		//To save mail
+		$this->loader->add_action('init', $plugin_public,'save_subscriber_email');
 	}
 
 	/**
