@@ -100,26 +100,25 @@ class Subscribe_me_Public {
 
 	}
 
-	public function email_subscriber_form_shortcode_fun()
+	public function email_subscriber_form()
 	{
-		add_shortcode('my-shortcode', array($this, 'email_subscriber_form_shortcode'));
+		add_shortcode('my-shortcode', array($this, 'form_shortcode'));
 	}
 
 	//Callback for shortcode
-	function email_subscriber_form_shortcode()
+	function form_shortcode()
 	{
 		$output = '<div class="wrap subs-wrap mail-form">
                     <form class="subscribe-me-form" method="post">
                         <input type="hidden" name="action" value="subs_form">
-                        <label for="email">Email:</label>
-                        <input type="email" name="email" id="email" required/><br />
-                        <input type="submit" name="submit" id="subscribe-button" value="Subscribe Me"/>
+                        <label for="email">Email:</label><input type="email" name="email" id="email" required/><br />
+                        <input type="submit" name="submit" id="button" value="Subscribe Me"/>
                     </form>
                 </div>';
 		return $output;
 	}
 
-	function add_shortcode_to_header()
+	function add_shortcode()
 	{
 		echo do_shortcode('[my-shortcode]');
 	}
@@ -162,7 +161,7 @@ class Subscribe_me_Public {
 
 	function send_subscription_mail($to)
 	{
-		$subject = 'Congratulations! You are Subscribed';
+		$subject = 'Congratulations! You have Subscribed';
 		$summary = $this->get_daily_post_details();
 		$message = 'You are getting latest post details.';
 		$message .= "\n\n";
